@@ -1,11 +1,10 @@
 import static org.junit.Assert.assertEquals;
 
-import adventofcode2020.Day8;
 import adventofcode2020.Day9;
-import java.io.IOException;
 import org.junit.Test;
 
 public class Day9Test {
+
   @Test
   public void solve_shouldSolveExample() {
     assertEquals(Integer.valueOf(77),

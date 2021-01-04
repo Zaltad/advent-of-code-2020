@@ -1,15 +1,16 @@
 package adventofcode2020;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.stream.Stream;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
+import org.apache.commons.io.IOUtils;
 
 public class Day2 {
-  public long solve() throws IOException {
-    try (Stream<String> stream = Files.lines(Paths.get("input2.txt"))) {
-      return stream.filter(this::isValid).count();
-    }
+
+  public long solve(InputStream inputStream) throws IOException {
+    List<String> lines = IOUtils.readLines(inputStream, StandardCharsets.UTF_8);
+    return lines.stream().filter(this::isValid).count();
   }
 
   private boolean isValid(String line) {

@@ -1,14 +1,14 @@
 import static org.junit.Assert.assertEquals;
 
-import adventofcode2020.Day22;
+import adventofcode2020.Day2;
 import java.io.IOException;
 import org.junit.Test;
 
-public class Day22Test {
+public class Day2Test {
 
   @Test
   public void solve_shouldSolveExample() throws IOException {
-    assertEquals(291,
-        new Day22().solve(getClass().getClassLoader().getResourceAsStream("input22.txt")));
+    assertEquals(1,
+        new Day2().solve(getClass().getClassLoader().getResourceAsStream("input2.txt")));
   }
 }

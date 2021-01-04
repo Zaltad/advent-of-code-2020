@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import org.junit.Test;
 
 public class Day13Test {
+
   @Test
   public void solve_shouldSolveExample() throws FileNotFoundException {
     assertEquals(1068781,

@@ -1,12 +1,11 @@
 import static org.junit.Assert.assertEquals;
 
-import adventofcode2020.Day16;
 import adventofcode2020.Day17;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import org.junit.Test;
 
 public class Day17Test {
+
   @Test
   public void solve_shouldSolveExample() throws FileNotFoundException {
     assertEquals(848,

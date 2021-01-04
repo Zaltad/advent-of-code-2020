@@ -21,7 +21,7 @@ public class Day7 {
     return findNestedBagsCount("shiny gold", bagsWithCounts, new HashMap<>());
   }
 
-  public Map<String, List<BagInformation>> parseContainedBagsWithCounts(List<String> lines) {
+  private Map<String, List<BagInformation>> parseContainedBagsWithCounts(List<String> lines) {
     return lines.stream()
         .flatMap(line -> {
           String[] parts = line.split(CONTAIN_SEPARATOR);
@@ -42,7 +42,7 @@ public class Day7 {
         .collect(Collectors.groupingBy(BagInformation::getBag));
   }
 
-  public int findNestedBagsCount(String bag,
+  private int findNestedBagsCount(String bag,
       Map<String, List<BagInformation>> bagsWithCounts,
       Map<String, Integer> knownCounts) {
     if (knownCounts.containsKey(bag)) {
@@ -59,7 +59,7 @@ public class Day7 {
     return bagsInside;
   }
 
-  public String bagNameExtractor(String bag) {
+  private String bagNameExtractor(String bag) {
     return bag.substring(0, bag.contains(" bags") ? bag.indexOf(" bags") : bag.indexOf(" bag"));
   }
 

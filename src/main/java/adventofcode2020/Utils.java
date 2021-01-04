@@ -23,7 +23,8 @@ public class Utils {
 
   public static List<List<String>> readLineGroups(InputStream inputStream) throws IOException {
     List<List<String>> lineGroups = new ArrayList<>();
-    try (BufferedReader br = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
+    try (BufferedReader br = new BufferedReader(
+        new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
       List<String> linesGroup = new ArrayList<>();
       String line;
       while ((line = br.readLine()) != null) {

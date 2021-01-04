@@ -1,11 +1,10 @@
 import static org.junit.Assert.assertEquals;
 
-import adventofcode2020.Day14;
 import adventofcode2020.Day15;
-import java.io.IOException;
 import org.junit.Test;
 
 public class Day15Test {
+
   @Test
   public void solve_shouldSolveExample1() {
     assertEquals(175594,
