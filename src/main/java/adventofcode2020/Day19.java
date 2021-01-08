@@ -3,10 +3,10 @@ package adventofcode2020;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.Value;
@@ -31,45 +31,44 @@ public class Day19 {
       }
     })
         .collect(Collectors.toMap(Rule::getId, Function.identity()));
-    System.out.println(lineGroups.get(1).stream()
-        .filter(message -> {
-          Integer index = validateMessage(message, List.of(0), 0, rules);
-          return index != null && index == message.length();
-        })
-        .collect(Collectors.toList()));
     return lineGroups.get(1).stream()
         .filter(message -> {
-          Integer index = validateMessage(message, List.of(0), 0, rules);
-          return index != null && index == message.length();
+          Set<Integer> indexes = validateMessage(message, List.of(0), 0, rules);
+          return indexes.stream().anyMatch(ind -> ind == message.length());
         })
         .count();
   }
 
-  private Integer validateMessage(String message, List<Integer> ruleIds, int index,
+  private Set<Integer> validateMessage(String message, List<Integer> ruleIds, int index,
       Map<Integer, Rule> rules) {
+    if (index > message.length()) {
+      return Set.of();
+    }
+    if (ruleIds.isEmpty()) {
+      return Set.of(index);
+    }
     List<Rule> conditions = ruleIds.stream()
         .map(rules::get)
         .collect(Collectors.toList());
+    Set<Integer> indexes = Set.of(index);
     for (Rule rule : conditions) {
+      if (indexes.isEmpty()) {
+        return Set.of();
+      }
       if (rule.getPattern() != null) {
-        if (index < message.length() && message.charAt(index) == rule.getPattern()) {
-          index++;
-        } else {
-          return null;
-        }
+        indexes = indexes.stream()
+            .filter(ind -> ind < message.length() && message.charAt(ind) == rule.getPattern())
+            .map(ind -> ind + 1)
+            .collect(Collectors.toSet());
       } else {
-        int finalIndex = index;
-        Optional<Integer> indexOptional = rule.getNestedRules().stream()
-            .map(nestedRule -> validateMessage(message, nestedRule, finalIndex, rules))
-            .filter(Objects::nonNull)
-            .findFirst();
-        if (indexOptional.isEmpty()) {
-          return null;
-        }
-        index = indexOptional.get();
+        indexes = indexes.stream()
+            .flatMap(ind -> rule.getNestedRules().stream()
+                .map(nestedRules -> validateMessage(message, nestedRules, ind, rules))
+                .flatMap(Collection::stream)
+            ).collect(Collectors.toSet());
       }
     }
-    return index;
+    return indexes;
   }
 
   @Value
