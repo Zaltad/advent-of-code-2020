@@ -43,7 +43,7 @@ public class Day20 {
       List<char[][]> orientedTiles = new ArrayList<>();
       for (int i = 0; i < 4; i++) {
         orientedTiles.add(tile);
-        orientedTiles.add(reverseTiles(tile));
+        orientedTiles.add(reverseTile(tile));
         tile = rotateTiling(tile);
       }
       return new Tile(tileId, orientedTiles);
@@ -65,24 +65,26 @@ public class Day20 {
         .collect(Collectors.toList());
   }
 
-  private char[][] mergeCroppedTiles(int borderSize, List<char[][]> croppedTiles) {
-    char[][] croppedTiling = new char[borderSize * croppedTiles.get(0).length][];
-    for (int block = 0; block < borderSize; block++) {
-      for (int line = block * croppedTiles.get(0).length;
-          line < (block + 1) * croppedTiles.get(0).length; line++) {
-        int shiftedLine = line - block * croppedTiles.get(0).length;
-        StringBuilder concatenatedLine = new StringBuilder();
-        for (int tileIndex = block * borderSize; tileIndex < (block + 1) * borderSize;
-            tileIndex++) {
-          concatenatedLine.append(croppedTiles.get(tileIndex)[shiftedLine]);
+  private char[][] mergeCroppedTiles(int blocksAmount, List<char[][]> croppedTiles) {
+    int blockLength = croppedTiles.get(0).length;
+    char[][] croppedTiling = new char[blocksAmount * blockLength][];
+    for (int blockIndex = 0; blockIndex < blocksAmount; blockIndex++) {
+      for (int line = blockIndex * blockLength;
+          line < (blockIndex + 1) * blockLength; line++) {
+        int lineOffset = line - blockIndex * blockLength;
+        StringBuilder concatLine = new StringBuilder();
+        for (int tileIndex = blockIndex * blocksAmount; tileIndex < (blockIndex + 1) * blocksAmount;
+            tileIndex++) { //?
+          concatLine.append(croppedTiles.get(tileIndex)[lineOffset]);
         }
-        croppedTiling[line] = concatenatedLine.toString().toCharArray();
+        croppedTiling[line] = concatLine.toString().toCharArray();
       }
     }
     return croppedTiling;
   }
 
-  private boolean matchesPattern(char[][] croppedTiling, int n, int i, int j, boolean fill) {
+  private boolean matchesPattern(char[][] croppedTiling, int i, int j, boolean fill) {
+    int n = croppedTiling.length;
     boolean allMatch = true;
     for (Position cell : MONSTER_CELLS) {
       int x = cell.getX() + i;
@@ -95,33 +97,33 @@ public class Day20 {
     return allMatch;
   }
 
-  private boolean checkRotation(char[][] croppedTiling, int n) {
+  private boolean checkRotation(char[][] croppedTiling) {
+    int n = croppedTiling.length;
     boolean found = false;
     for (int i = 0; i < n; i++) {
       for (int j = 0; j < n; j++) {
-        if (matchesPattern(croppedTiling, n, i, j, false)) {
+        if (matchesPattern(croppedTiling, i, j, false)) {
           found = true;
-          matchesPattern(croppedTiling, n, i, j, true);
+          matchesPattern(croppedTiling, i, j, true);
         }
       }
     }
     return found;
   }
 
-  private void findTiling(int index, List<Tile> tiles, int borderSize, List<Tile> usedTiles,
+  private void findTiling(int index, List<Tile> tiles, int blocksAmount, List<Tile> usedTiles,
       List<Integer> rotations) {
     if (index == tiles.size()) {
       List<char[][]> croppedTiles = getCroppedTiles(usedTiles, rotations);
-      char[][] croppedTiling = mergeCroppedTiles(borderSize, croppedTiles);
-      int n = croppedTiling.length;
+      char[][] croppedTiling = mergeCroppedTiles(blocksAmount, croppedTiles);
       boolean found = false;
       for (int i = 0; i < 4; i++) {
-        if (checkRotation(croppedTiling, n)) {
+        if (checkRotation(croppedTiling)) {
           found = true;
           break;
         }
-        char[][] reversedTiling = reverseTiles(croppedTiling);
-        if (checkRotation(reversedTiling, n)) {
+        char[][] reversedTiling = reverseTile(croppedTiling);
+        if (checkRotation(reversedTiling)) {
           found = true;
           croppedTiling = reversedTiling;
           break;
@@ -138,9 +140,9 @@ public class Day20 {
       }
     } else {
       for (int i = 0; i < tiles.size(); i++) {
-        if (!usedTiles.contains(i)) {
+        if (!usedTiles.contains(tiles.get(i))) {
           for (int orientation = 0; orientation < 8; orientation++) {
-            if (index % borderSize != 0) {
+            if (index % blocksAmount != 0) { //not left-side
               String[] neighborBorders = getBorders(usedTiles.get(index - 1)
                   .getOrientedTiles().get(rotations.get(index - 1)));
               if (!neighborBorders[Side.E.ordinal()]
@@ -149,10 +151,10 @@ public class Day20 {
                 continue;
               }
             }
-            if (index - borderSize >= 0) {
-              String[] neighborBorders = getBorders(usedTiles.get(index - borderSize)
+            if (index - blocksAmount >= 0) { //not upper-side
+              String[] neighborBorders = getBorders(usedTiles.get(index - blocksAmount)
                   .getOrientedTiles()
-                  .get(rotations.get(index - borderSize)));
+                  .get(rotations.get(index - blocksAmount)));
               if (!neighborBorders[Side.S.ordinal()].equals(
                   getBorders(tiles.get(i).getOrientedTiles().get(orientation))[Side.N.ordinal()])) {
                 continue;
@@ -160,7 +162,7 @@ public class Day20 {
             }
             usedTiles.add(tiles.get(i));
             rotations.add(orientation);
-            findTiling(index + 1, tiles, borderSize, usedTiles, rotations);
+            findTiling(index + 1, tiles, blocksAmount, usedTiles, rotations);
             usedTiles.remove(usedTiles.size() - 1);
             rotations.remove(rotations.size() - 1);
           }
@@ -180,7 +182,7 @@ public class Day20 {
     return rotatedTile;
   }
 
-  private char[][] reverseTiles(char[][] tile) {
+  private char[][] reverseTile(char[][] tile) {
     int n = tile.length;
     char[][] reversedTile = new char[n][n];
     for (int i = 0; i < n; i++) {
